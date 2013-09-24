@@ -18,3 +18,4 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+/libs/yadrone_03.jar
