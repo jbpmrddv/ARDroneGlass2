@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+>
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Status"
+    />
+    <Button
+        android:id="@+id/btnFly"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="takeoff"
+        android:text="Take Off"
+    />
+    <Button
+        android:id="@+id/btnLand"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="land"
+        android:text="Land"
+    />    
+    
+    <Button
+        android:id="@+id/btnEmergency"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="emergency"
+        android:text="Emergency"
+    />    
+    <TextView
+        android:id="@+id/tvDrone"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+    />
+    <TextView
+        android:id="@+id/tvDevice"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+    />
+    <TextView
+        android:id="@+id/log"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+    />    
+<!--    
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dip" >
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/cmd_forward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:padding="20dip"
+                android:text="Forward" 
+                android:onClick="forward"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/cmd_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dip"
+                android:text="Left"
+                android:onClick="left"/>
+
+            <Button
+                android:id="@+id/cmd_backward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dip"
+                android:text="Backward"
+                android:onClick="backward"/>
+
+            <Button
+                android:id="@+id/cmd_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dip"
+                android:text="Right"
+                android:onClick="right"/>
+        </TableRow>
+    </TableLayout>
+-->     
+</LinearLayout>
+
