@@ -1,22 +1,20 @@
 /*
  *
-  Copyright (C) <2013>, <Vandrico Solutions>
-All rights reserved.
+ Copyright (C) <2013>, <Vandrico Solutions>
+ All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-The names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ The names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-
 package com.vandrico.glass.ardrone2;
 
 import android.app.Activity;
@@ -86,7 +84,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     boolean isFlying = false;
     CommandManager cmdMgr;
     private boolean isMoving = false;
-    Handler handler;
+    Handler handler = new Handler();
+    final Runnable r = new Runnable() {
+        public void run() {
+            calculateInput();
+            handler.postDelayed(this, 100);
+        }
+    };
 
     public void calculateInput() {
         SensorManager.getRotationMatrixFromVector(mRotationMatrix, mRotation);
@@ -127,7 +131,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
 
             isMoving = true;
-        } else if (Math.abs(pitch) > 20 && Math.abs(pitch) < 40) {
+        }
+
+        if (Math.abs(pitch) > 20 && Math.abs(pitch) < 40) {
             if (pitch > 0) {
                 //cmdMgr.setLedsAnimation(LEDAnimation.BLINK_ORANGE, 3, 1);
                 cmdMgr.forward((int) (Math.abs(pitch / 60) * 20));
@@ -144,12 +150,11 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
 
             isMoving = true;
-        } else if (isMoving) {
-            cmdMgr.hover();
-            isMoving = false;
         }
 
-        if (!isMoving) {
+        if (isMoving && Math.abs(roll) < 20 && Math.abs(pitch) < 20) {
+            cmdMgr.hover();
+            isMoving = false;
             status.setText("Hovering");
         }
 
@@ -165,6 +170,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         sm = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -180,18 +187,18 @@ public class MainActivity extends Activity implements SensorEventListener {
         mRotation = new float[3];
         yaw = pitch = roll = 0;
 
+        //connectToDrone();
+
+        handler.postDelayed(r, 100);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume(); //To change body of generated methods, choose Tools | Templates.
-        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_UI);
-
+    private void connectToDrone() {
         // connect to drone
         try {
             //drone = new ARDrone("192.168.10.99");
             drone = new MyARDrone("192.168.0.1", null);
             log.append("\n\nInitialize the drone ...\n");
+
             drone.start();
             log.append("\n\nDONE.\n");
 
@@ -211,10 +218,20 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume(); //To change body of generated methods, choose Tools | Templates.
+        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_UI);
+
+        connectToDrone();
+        handler.postDelayed(r, 100);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause(); //To change body of generated methods, choose Tools | Templates.
 
-        //handler.removeCallbacks(r);
+        handler.removeCallbacks(r);
+        
         sm.unregisterListener(this);
 
         if (isFlying) {
@@ -228,10 +245,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-
             System.arraycopy(event.values, 0, mRotation, 0, 3);
-
-            calculateInput();
         }
     }
 
