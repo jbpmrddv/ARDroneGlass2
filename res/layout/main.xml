@@ -1,72 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-	android:id="@+id/widget32"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-<LinearLayout
-	android:id="@+id/widget34"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:orientation="vertical"
-	android:gravity="right"
-	android:layout_weight="1"
-	android:layout_gravity="right">
-<TextView
-        android:id="@+id/status"
+    android:id="@+id/widget32"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:id="@+id/widget34"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Status"
-    />
-    <TextView
-        android:id="@+id/tvDrone"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="right"
+        android:layout_weight="1"
+        android:layout_gravity="right">
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Status"
+        />
+        <TextView
+            android:id="@+id/tvDrone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+        />
+        <TextView
+            android:id="@+id/tvDevice"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+        />
+        <TextView
+            android:id="@+id/log"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+        />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget33"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-    />
-    <TextView
-        android:id="@+id/tvDevice"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-    />
-    <TextView
-        android:id="@+id/log"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-    />
-</LinearLayout>
-<LinearLayout
-	android:id="@+id/widget33"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:orientation="vertical"
-	android:gravity="left"
-	android:layout_weight="1">
-<Button
-        android:id="@+id/btnFly"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="takeoff"
-        android:text="Take Off"
-    />
-    <Button
-        android:id="@+id/btnLand"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="land"
-        android:text="Land"
-    />
-
-    <Button
-        android:id="@+id/btnEmergency"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="emergency"
-        android:text="Emergency"
-    />
-</LinearLayout>
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="left"
+        android:layout_weight="1">
+        <Button
+            android:id="@+id/btnFly"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="takeoff"
+            android:text="Take Off"
+        />
+        <Button
+            android:id="@+id/btnLand"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="land"
+            android:text="Land"
+        />
+        <Button
+            android:id="@+id/btnLand"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="up"
+            android:text="UP"
+        />
+    
+        <Button
+            android:id="@+id/btnLand"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="down"
+            android:text="DOWN"
+        />
+    
+        <Button
+            android:id="@+id/btnLand"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="flip"
+            android:text="FLIP"
+        />
+<!--
+        <Button
+            android:id="@+id/btnEmergency"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="emergency"
+            android:text="Emergency"
+        />
+-->
+    </LinearLayout>
 </LinearLayout>
 
 

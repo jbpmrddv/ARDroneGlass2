@@ -31,18 +31,22 @@ import android.widget.TextView;
 
 import de.yadrone.base.ARDrone;
 import de.yadrone.base.command.CommandManager;
+import de.yadrone.base.command.FlightAnimation;
 import de.yadrone.base.command.LEDAnimation;
+import de.yadrone.base.navdata.Altitude;
 import de.yadrone.base.navdata.AttitudeListener;
 import de.yadrone.base.navdata.BatteryListener;
+import de.yadrone.base.navdata.AltitudeListener;
 
-class MyARDrone extends ARDrone implements BatteryListener, AttitudeListener {
+class MyARDrone extends ARDrone implements BatteryListener, AttitudeListener, AltitudeListener {
 
     public float yaw, pitch, roll;
-    public int iBatteryLv;
+    public int iBatteryLv, altitude;
 
     MyARDrone(String ip, Object object) {
         super(ip, null);
         yaw = pitch = roll = 0;
+        altitude = 0;
 
         getNavDataManager().addBatteryListener(this);
         getNavDataManager().addAttitudeListener(this);
@@ -68,6 +72,15 @@ class MyARDrone extends ARDrone implements BatteryListener, AttitudeListener {
     }
 
     public void windCompensation(float pitch, float roll) {
+    }
+
+    public void receivedAltitude(int i) {
+        altitude = i;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void receivedExtendedAltitude(Altitude altd) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
 
@@ -102,30 +115,25 @@ public class MainActivity extends Activity implements SensorEventListener {
         pitch = (float) Math.toDegrees(mOrientation[1]);
         roll = (float) Math.toDegrees(mOrientation[2]);
 
-        tvDrone.setText(String.format("Drone\nyaw:%f\npitch:%f\nroll:%f\nBattery:%d", drone.yaw, drone.pitch, drone.roll, drone.iBatteryLv));
+        tvDrone.setText(String.format("Drone\nyaw:%f\npitch:%f\nroll:%f\nBattery:%d\nAltitude:%f", drone.yaw, drone.pitch, drone.roll, drone.iBatteryLv, (float) (drone.altitude / 1000)));
         tvDevice.setText(String.format("Device\nyaw:%f\npitch:%f\nroll:%f\n", yaw, pitch, roll));
 
 
         // we are not flying
         if (!isFlying) {
-            //handler.postDelayed(this, 200);
             return;
         }
 
-        if (Math.abs(roll) > 20 && Math.abs(roll) < 40) {
+        if (Math.abs(roll) > 20 && Math.abs(roll) < 90) {
             if (roll < 0) {
-                //cmdMgr.setLedsAnimation(LEDAnimation.LEFT_GREEN_RIGHT_RED, 3, 1);
-                //cmdMgr.goLeft((int) (Math.abs(roll / 60) * 20));
-                cmdMgr.goLeft(20);
-                //cmdMgr.spinLeft((int) Math.abs(roll / 90) * 100);
+                cmdMgr.goLeft((int) (Math.abs(roll / 90) * 100));
+                //cmdMgr.goLeft(20);
 
                 status.setText("Go Left");
 
             } else if (roll > 0) {
-                //cmdMgr.setLedsAnimation(LEDAnimation.LEFT_RED_RIGHT_GREEN, 3, 1);
-                //cmdMgr.goRight((int) (Math.abs(roll / 60) * 20));
-                cmdMgr.goRight(20);
-                //cmdMgr.spinRight((int) Math.abs(roll / 90) * 100);
+                cmdMgr.goRight((int) (Math.abs(roll / 90) * 100));
+                //cmdMgr.goRight(20);
 
                 status.setText("Go Right");
             }
@@ -133,17 +141,15 @@ public class MainActivity extends Activity implements SensorEventListener {
             isMoving = true;
         }
 
-        if (Math.abs(pitch) > 20 && Math.abs(pitch) < 40) {
+        if (Math.abs(pitch) > 20 && Math.abs(pitch) < 90) {
             if (pitch > 0) {
-                //cmdMgr.setLedsAnimation(LEDAnimation.BLINK_ORANGE, 3, 1);
-                cmdMgr.forward((int) (Math.abs(pitch / 60) * 20));
+                cmdMgr.forward((int) (Math.abs(pitch / 90) * 100));
                 //cmdMgr.forward(20);
 
                 status.setText("Forward");
 
             } else if (pitch < 0) {
-                //cmdMgr.setLedsAnimation(LEDAnimation.BLINK_RED, 3, 1);
-                cmdMgr.backward((int) (Math.abs(pitch / 60) * 20));
+                cmdMgr.backward((int) (Math.abs(pitch / 90) * 100));
                 //cmdMgr.backward(20);
 
                 status.setText("Backward");
@@ -158,7 +164,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             status.setText("Hovering");
         }
 
-        //handler.postDelayed(this, 100);
     }
 
     /**
@@ -187,9 +192,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         mRotation = new float[3];
         yaw = pitch = roll = 0;
 
-        //connectToDrone();
-
-        handler.postDelayed(r, 100);
     }
 
     private void connectToDrone() {
@@ -197,9 +199,10 @@ public class MainActivity extends Activity implements SensorEventListener {
         try {
             //drone = new ARDrone("192.168.10.99");
             drone = new MyARDrone("192.168.0.1", null);
-            log.append("\n\nInitialize the drone ...\n");
 
+            log.append("\n\nInitialize the drone ...\n");
             drone.start();
+
             log.append("\n\nDONE.\n");
 
             cmdMgr = drone.getCommandManager();
@@ -220,7 +223,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     protected void onResume() {
         super.onResume(); //To change body of generated methods, choose Tools | Templates.
-        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_UI);
+        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_GAME);
 
         connectToDrone();
         handler.postDelayed(r, 100);
@@ -231,18 +234,16 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onPause(); //To change body of generated methods, choose Tools | Templates.
 
         handler.removeCallbacks(r);
-        
         sm.unregisterListener(this);
 
+        // tell the drone to land!
         if (isFlying) {
             drone.landing();
         }
-
         drone.stop();
-
-
     }
 
+    // reading user sensor
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             System.arraycopy(event.values, 0, mRotation, 0, 3);
@@ -250,12 +251,14 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    // Command Buttons
     public void takeoff(View v) {
 
         cmdMgr.flatTrim();
+        cmdMgr.setMaxAltitude(10000);
+        cmdMgr.setMinAltitude(1000);
         cmdMgr.setLedsAnimation(LEDAnimation.BLINK_ORANGE, 3, 1);
         try {
             drone.takeOff();
@@ -271,7 +274,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         cmdMgr.setLedsAnimation(LEDAnimation.BLINK_GREEN, 3, 1);
 
-
         isFlying = false;
     }
 
@@ -280,19 +282,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         isFlying = false;
     }
 
-    public void forward(View v) {
-        cmdMgr.forward(20);
+    public void flip(View v) {
+        cmdMgr.animate(FlightAnimation.FLIP_AHEAD);
     }
 
-    public void backward(View v) {
-        cmdMgr.backward(20);
+    public void up(View v) {
+        cmdMgr.up(100);
     }
 
-    public void left(View v) {
-        cmdMgr.goLeft(20);
-    }
-
-    public void right(View v) {
-        cmdMgr.goRight(20);
+    public void down(View v) {
+        cmdMgr.down(100);
     }
 }
