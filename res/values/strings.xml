@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vandrico ARDrone Glass</string>
+    <string name="app_voice_trigger">Start Drone</string>    
+
 </resources>

@@ -198,7 +198,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         // connect to drone
         try {
             //drone = new ARDrone("192.168.10.99");
-            drone = new MyARDrone("192.168.0.1", null);
+            drone = new MyARDrone("192.168.1.1", null);
 
             log.append("\n\nInitialize the drone ...\n");
             drone.start();
